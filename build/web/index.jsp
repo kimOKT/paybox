@@ -14,7 +14,7 @@
     <body>
         <h1>Payement direct</h1>
         
-        <form action="/CallAPI" method="post" name="Tests Paybox Direct">
+        <form action="CallAPI" method="post" name="Tests Paybox Direct">
             Montant
             <input name="MONTANT" value="1000" size="10" maxlength="10" type="text"><br>
             <input type="submit">

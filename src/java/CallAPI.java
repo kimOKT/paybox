@@ -14,6 +14,8 @@ import javax.servlet.http.HttpServletResponse;
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.WebResource;
+
+
 import javax.servlet.RequestDispatcher;
 
 
@@ -30,7 +32,7 @@ public class CallAPI extends HttpServlet {
             throws  ServletException, IOException {
         try
         {
-            String montant = request.getParameter("montant");
+            String montant = request.getParameter("MONTANT");
             if(this.getResponseFromAPIPaybox(montant)){
                 RequestDispatcher requestDispatcher = request.getRequestDispatcher("/success.jsp");
                 requestDispatcher.forward(request, response);
@@ -79,7 +81,10 @@ public class CallAPI extends HttpServlet {
                     identifiant,cle,devise,reference,version,porteur,
                     dateval,cvv,archivage,differe,numAppel,numtrans,
                     autorisation,pays);
-
+            
+            url = "https://preprod-ppps.paybox.com/PPPS.php" + url;
+            System.out.println(url);
+            
             Client client = Client.create();
             WebResource webResource2 = client.resource(url);
             ClientResponse response2 = webResource2.accept("application/json").get(ClientResponse.class);
@@ -89,7 +94,7 @@ public class CallAPI extends HttpServlet {
             }
             String output2 = response2.getEntity(String.class);
             System.out.println(output2);
-
+            
             return response;
         }
         catch(Exception exception){
@@ -103,7 +108,7 @@ public class CallAPI extends HttpServlet {
             String autorisation,String pays){
         
         String lastUrl = "";
-        lastUrl += "&DATEQ="+dateQ;
+        lastUrl += "?DATEQ="+dateQ;
         lastUrl += "&TYPE="+type;
         lastUrl += "&NUMQUESTION="+numQuestion;
         lastUrl += "&MONTANT="+montant;
@@ -112,7 +117,7 @@ public class CallAPI extends HttpServlet {
         lastUrl += "&IDENTIFIANT="+identifiant;
         lastUrl += "&CLE="+cle;
         lastUrl += "&DEVISE="+devise;
-        lastUrl += "&REFERENCE="+reference;
+        lastUrl += "&REFERENCE="+this.formatReference(reference);
         lastUrl += "&VERSION="+version;
         lastUrl += "&PORTEUR="+porteur;
         lastUrl += "&DATEVAL="+dateval;
@@ -125,5 +130,10 @@ public class CallAPI extends HttpServlet {
         lastUrl += "&PAYS="+pays;
         
         return lastUrl;
+    }
+    
+    String formatReference(String reference){
+        reference = reference.replaceAll("\\s","+");
+        return reference;
     }
 }

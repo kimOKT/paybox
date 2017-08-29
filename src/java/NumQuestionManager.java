@@ -1,10 +1,10 @@
-
+ 
 import java.text.NumberFormat;
 
 
 public class NumQuestionManager {
     
-    public static int listNumAlreadyUsed =  0;
+    public static int listNumAlreadyUsed =  15;
     
     public String getNumQuestion(){
         int numberAsInt = listNumAlreadyUsed++;
