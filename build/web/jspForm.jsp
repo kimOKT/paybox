@@ -14,11 +14,11 @@
     <body>
         
         
-        <form action="https://preprod-ppps.paybox.com/PPPS.php" method="get" name="Tests Paybox Direct">
+        <form action="https://preprod-ppps.paybox.com/PPPS.php" method="post" name="Tests Paybox Direct">
                 Date (JJMMAAAA)
                 <input name="DATEQ" value="20032007" size="8" maxlength="8" type="text"><br>
                 Type de question
-                <input name="TYPE" value="00001" size="5" maxlength="5" type="text"><br>
+                <input name="TYPE" value="00002" size="5" maxlength="5" type="text"><br>
                 Numero de question
                 <input name="NUMQUESTION" value="0000000001" size="10" maxlength="10" type="text"><br>
                 Montant
@@ -31,7 +31,7 @@
                 <input name="REFERENCE" value="Hello World" size="30" maxlength="30" type="text"><br>
                 <input name="VERSION" value="00104" type="hidden"><br>
                 <input name="CLE" value="1999888I" type="hidden"><br>
-                <input name="IDENTIFIANT" value="" type="hidden"><br>
+                <input name="IDENTIFIANT" value="107904482" type="hidden"><br>
                 <input name="DEVISE" value="978" type="hidden"><br>
                 <input name="PORTEUR" value="1111222233334444" type="hidden"><br>
                 <input name="DATEVAL" value="1010" type="hidden"><br>

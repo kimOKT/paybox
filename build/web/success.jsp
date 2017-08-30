@@ -12,6 +12,6 @@
         <title>JSP Page</title>
     </head>
     <body>
-        <h1>Success</h1>
+        <h1>Paiement reussi</h1>
     </body>
 </html>

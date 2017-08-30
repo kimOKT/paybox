@@ -12,6 +12,6 @@
         <title>JSP Page</title>
     </head>
     <body>
-        <h1>Error !! <%= request.getAttribute("error") %></h1>
+        <h1>Erreur lors du paiement! <%= request.getAttribute("error") %></h1>
     </body>
 </html>

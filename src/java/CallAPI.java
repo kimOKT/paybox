@@ -14,9 +14,11 @@ import javax.servlet.http.HttpServletResponse;
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.WebResource;
+import com.sun.jersey.api.representation.Form;
 
 
 import javax.servlet.RequestDispatcher;
+import javax.ws.rs.core.MediaType;
 
 
 public class CallAPI extends HttpServlet {
@@ -52,14 +54,14 @@ public class CallAPI extends HttpServlet {
     public boolean getResponseFromAPIPaybox(String montant) throws Exception{
         try{
             boolean response = true;
-            // Compte de test 
+            
             DateManager dateManager = new DateManager();
-            NumQuestionManager numManager = new NumQuestionManager();
 
             String site = "1999888";
             String dateQ = dateManager.getDateActuel();
             String type = "00001";
-            String numQuestion = numManager.getNumQuestion();
+            String numQuestion = NumQuestionManager.getNumQuestion();
+            System.out.println(numQuestion);
             String rang = "32";
             String identifiant = "107904482";
             String cle = "1999888I"; 
@@ -77,23 +79,24 @@ public class CallAPI extends HttpServlet {
             String autorisation = "";
             String pays = "";
 
-            String url = this.getUrl(dateQ,type,numQuestion,montant,site,rang,
+            Form form = this.getForm(dateQ,type,numQuestion,montant,site,rang,
                     identifiant,cle,devise,reference,version,porteur,
                     dateval,cvv,archivage,differe,numAppel,numtrans,
                     autorisation,pays);
             
-            url = "https://preprod-ppps.paybox.com/PPPS.php" + url;
-            System.out.println(url);
-            
+            String baseUrl = "https://preprod-ppps.paybox.com/PPPS.php";
             Client client = Client.create();
-            WebResource webResource2 = client.resource(url);
-            ClientResponse response2 = webResource2.accept("application/json").get(ClientResponse.class);
+            WebResource webResource2 = client.resource(baseUrl);
+            ClientResponse response2 = webResource2.type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class, form);
+            
             if (response2.getStatus() != 200) {
                 response = false;
                 throw new RuntimeException("Failed : HTTP error code : " + response2.getStatus());
             }
+            response2.bufferEntity();
             String output2 = response2.getEntity(String.class);
             System.out.println(output2);
+            response = this.analyseReponse(output2);
             
             return response;
         }
@@ -102,38 +105,54 @@ public class CallAPI extends HttpServlet {
         }
     }
     
-    public String getUrl(String dateQ,String type,String numQuestion,String montant,String site,String rang,
+    public Form getForm(String dateQ,String type,String numQuestion,String montant,String site,String rang,
             String identifiant,String cle,String devise, String reference,String version,String porteur,
             String dateval,String cvv,String archivage,String differe,String numappel,String numtrans,
             String autorisation,String pays){
         
-        String lastUrl = "";
-        lastUrl += "?DATEQ="+dateQ;
-        lastUrl += "&TYPE="+type;
-        lastUrl += "&NUMQUESTION="+numQuestion;
-        lastUrl += "&MONTANT="+montant;
-        lastUrl += "&SITE="+site;
-        lastUrl += "&RANG="+rang;
-        lastUrl += "&IDENTIFIANT="+identifiant;
-        lastUrl += "&CLE="+cle;
-        lastUrl += "&DEVISE="+devise;
-        lastUrl += "&REFERENCE="+this.formatReference(reference);
-        lastUrl += "&VERSION="+version;
-        lastUrl += "&PORTEUR="+porteur;
-        lastUrl += "&DATEVAL="+dateval;
-        lastUrl += "&CVV="+cvv;
-        lastUrl += "&ARCHIVAGE="+archivage;
-        lastUrl += "&DIFFERE="+differe;
-        lastUrl += "&NUMAPPEL="+numappel;
-        lastUrl += "&NUMTRANS="+numtrans;
-        lastUrl += "&AUTORISATION="+autorisation;
-        lastUrl += "&PAYS="+pays;
+        Form form = new Form();
+        form.add("DATEQ",dateQ);
+        form.add("TYPE",type);
+        form.add("NUMQUESTION",numQuestion);
+        form.add("MONTANT",montant);
+        form.add("SITE",site);
+        form.add("RANG",rang);
+        form.add("IDENTIFIANT",identifiant);
+        form.add("CLE",cle);
+        form.add("DEVISE",devise);
+        form.add("REFERENCE",this.formatReference(reference));
+        form.add("VERSION",version);
+        form.add("PORTEUR",porteur);
+        form.add("DATEVAL",dateval);
+        form.add("CVV",cvv);
+        form.add("ARCHIVAGE",archivage);
+        form.add("DIFFERE",differe);
+        form.add("NUMAPPEL",numappel);
+        form.add("NUMTRANS",numtrans);
+        form.add("AUTORISATION",autorisation);
+        form.add("PAYS",pays);
         
-        return lastUrl;
+        return form;
     }
     
     String formatReference(String reference){
         reference = reference.replaceAll("\\s","+");
         return reference;
+    }
+    
+    boolean analyseReponse(String reponse){
+        boolean valeur = true;
+        String[] list = reponse.split("&");
+        for(int i=0; i<list.length ; i++){
+            if(list[i].contains("CODEREPONSE")){
+                String[] listCode = list[i].split("=");
+                System.out.println("Code reponse = "+listCode[1]);
+                if(!listCode[1].equals("00000")){
+                    valeur = false;
+                }
+                break;
+            }
+        }
+        return valeur;
     }
 }
